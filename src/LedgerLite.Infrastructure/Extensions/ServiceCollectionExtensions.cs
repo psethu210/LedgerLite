@@ -1,5 +1,7 @@
 using LedgerLite.Infrastructure.Data;
 using LedgerLite.Infrastructure.Data.Configurations;
+using LedgerLite.Infrastructure.Services;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +17,7 @@ public static class ServiceCollectionExtensions
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException("DefaultConnection string is not configured");
-            
+
             options.UseSqlServer(connectionString, sqlOptions =>
             {
                 sqlOptions.EnableRetryOnFailure(
@@ -24,13 +26,10 @@ public static class ServiceCollectionExtensions
                     errorNumbersToAdd: null);
             });
         });
-        
-        // Override SaveChanges to enforce ledger entry immutability
-        services.Configure<DbContextOptions<LedgerContext>>(options =>
-        {
-            // This will be called when SaveChanges is invoked
-        });
-        
+
+        // Add application services
+        services.AddScoped<IdempotencyService>();
+
         return services;
     }
 }

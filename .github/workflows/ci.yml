@@ -13,6 +13,39 @@ jobs:
       - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
+      
+      # Restore dependencies
       - run: dotnet restore LedgerLite.sln
+      
+      # Check code formatting
+      - name: Verify code formatting
+        run: dotnet format LedgerLite.sln --verify-no-changes --verbosity diagnostic
+      
+      # Check for vulnerable packages
+      - name: Check for vulnerable packages
+        run: dotnet list package --vulnerable --include-transitive
+      
+      # Build
       - run: dotnet build LedgerLite.sln --no-restore --configuration Release
-      - run: dotnet test LedgerLite.sln --no-build --configuration Release
+      
+      # Run tests with coverage
+      - name: Test with coverage
+        run: dotnet test tests/LedgerLite.UnitTests/LedgerLite.UnitTests.csproj --no-restore --configuration Release --logger trx --collect:"XPlat Code Coverage"
+        
+      # Run integration tests separately (no coverage requirement)
+      - name: Integration tests
+        run: dotnet test tests/LedgerLite.IntegrationTests/LedgerLite.IntegrationTests.csproj --no-restore --configuration Release --logger trx
+      
+      # Install ReportGenerator tool and generate coverage report
+      - name: Generate coverage report
+        run: |
+          dotnet tool install --global dotnet-reportgenerator-globaltool
+          reportgenerator -reports:"tests/LedgerLite.UnitTests/coverage/coverage.cobertura.xml" -targetdir:"coverage-report" -reporttypes:"Html;Badges"
+      
+      # Upload coverage report as artifact
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage-report/

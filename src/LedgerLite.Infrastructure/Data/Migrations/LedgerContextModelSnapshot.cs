@@ -179,6 +179,41 @@ namespace LedgerLite.Infrastructure.Data.Migrations
                     b.ToTable("Transfers", (string)null);
                 });
 
+            modelBuilder.Entity("LedgerLite.Infrastructure.Services.IdempotencyRecord", b =>
+                {
+                    b.Property<string>("ClientId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Key")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("RequestHash")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ResponseBody")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ResponseStatus")
+                        .HasColumnType("int");
+
+                    b.HasKey("ClientId", "Key");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("IX_IdempotencyRecords_CreatedAt");
+
+                    b.ToTable("IdempotencyRecords", (string)null);
+                });
+
             modelBuilder.Entity("LedgerLite.Domain.LedgerEntry", b =>
                 {
                     b.HasOne("LedgerLite.Domain.Account", "Account")

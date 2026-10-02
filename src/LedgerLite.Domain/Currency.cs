@@ -18,7 +18,7 @@ public static class CurrencyExtensions
     /// All supported currencies use 2 decimal places, so 100 minor units = 1 major unit.
     /// </summary>
     public static int DecimalPlaces(this Currency currency) => 2;
-    
+
     /// <summary>
     /// Minor units per major unit. For 2 decimal places, this is 100.
     /// Example: 1.00 USD = 100 minor units (cents).

@@ -10,7 +10,7 @@ public class LedgerEntryResponse
     public string Currency { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty; // "Credit" or "Debit"
     public DateTime CreatedAt { get; set; }
-    
+
     public static LedgerEntryResponse FromLedgerEntry(LedgerEntry entry)
     {
         return new LedgerEntryResponse

@@ -1,7 +1,10 @@
-using LedgerLite.Api.Middleware;
-using LedgerLite.Infrastructure.Extensions;
-using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
+
+using LedgerLite.Api.Middleware;
+using LedgerLite.Api.Services;
+using LedgerLite.Infrastructure.Extensions;
+
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +22,7 @@ builder.Services.AddControllers()
                 Status = 400,
                 Instance = context.HttpContext.Request.Path
             };
-            
+
             return new BadRequestObjectResult(problemDetails);
         };
     })
@@ -35,6 +38,9 @@ builder.Services.AddProblemDetails();
 
 // Add Infrastructure layer
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Add application services
+builder.Services.AddScoped<TransferService>();
 
 // Add logging
 builder.Services.AddLogging();
@@ -79,3 +85,5 @@ app.MapGet("/health/ready", async (LedgerLite.Infrastructure.Data.LedgerContext 
 }).WithName("ReadinessCheck");
 
 app.Run();
+
+public partial class Program { } // Make accessible for integration tests

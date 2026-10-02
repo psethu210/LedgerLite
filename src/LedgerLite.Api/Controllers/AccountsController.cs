@@ -2,6 +2,7 @@ using LedgerLite.Api.Models;
 using LedgerLite.Domain;
 using LedgerLite.Domain.Exceptions;
 using LedgerLite.Infrastructure.Data;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,13 +30,13 @@ public class AccountsController : ControllerBase
         }
 
         var account = Account.CreateCustomerAccount(request.OwnerRef, request.Currency);
-        
+
         _context.Accounts.Add(account);
         await _context.SaveChangesAsync();
-        
-        _logger.LogInformation("Created account {AccountId} for owner {OwnerRef} in {Currency}", 
+
+        _logger.LogInformation("Created account {AccountId} for owner {OwnerRef} in {Currency}",
             account.Id, account.OwnerRef, account.Currency);
-        
+
         return CreatedAtAction(nameof(GetAccount), new { id = account.Id }, AccountResponse.FromAccount(account));
     }
 
@@ -43,7 +44,7 @@ public class AccountsController : ControllerBase
     public async Task<ActionResult<AccountResponse>> GetAccount(Guid id)
     {
         var account = await _context.Accounts.FindAsync(id);
-        
+
         if (account == null)
         {
             return NotFound(new ProblemDetails
@@ -55,7 +56,7 @@ public class AccountsController : ControllerBase
                 Instance = HttpContext.Request.Path
             });
         }
-        
+
         return AccountResponse.FromAccount(account);
     }
 
@@ -83,13 +84,13 @@ public class AccountsController : ControllerBase
         var clientId = (string)HttpContext.Items["ClientId"]!;
 
         using var transaction = await _context.Database.BeginTransactionAsync();
-        
+
         try
         {
             // Check for existing idempotent request
             var existingTransfer = await _context.Transfers
                 .FirstOrDefaultAsync(t => t.ClientId == clientId && t.IdempotencyKey == idempotencyKey);
-            
+
             if (existingTransfer != null)
             {
                 // Return the existing transfer (idempotency)
@@ -123,7 +124,7 @@ public class AccountsController : ControllerBase
 
             // Find or create external funding account for this currency
             var fundingAccount = await _context.Accounts
-                .FirstOrDefaultAsync(a => a.OwnerRef == $"EXTERNAL_FUNDING_{account.Currency}" && 
+                .FirstOrDefaultAsync(a => a.OwnerRef == $"EXTERNAL_FUNDING_{account.Currency}" &&
                                          a.Kind == AccountKind.System);
 
             if (fundingAccount == null)
@@ -135,13 +136,13 @@ public class AccountsController : ControllerBase
             // Create the deposit transfer
             var amount = Money.FromDecimal(request.Amount, account.Currency);
             var transfer = Transfer.CreateDeposit(clientId, idempotencyKey, fundingAccount.Id, account.Id, amount);
-            
+
             _context.Transfers.Add(transfer);
 
             // Create ledger entries (double-entry bookkeeping)
             var debitEntry = LedgerEntry.Debit(transfer.Id, fundingAccount.Id, amount);
             var creditEntry = LedgerEntry.Credit(transfer.Id, account.Id, amount);
-            
+
             _context.LedgerEntries.AddRange(debitEntry, creditEntry);
 
             // Update account balances
@@ -154,7 +155,7 @@ public class AccountsController : ControllerBase
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            _logger.LogInformation("Deposit completed: {Amount} {Currency} to account {AccountId}", 
+            _logger.LogInformation("Deposit completed: {Amount} {Currency} to account {AccountId}",
                 amount.ToDecimal(), amount.Currency, account.Id);
 
             return Ok(new DepositResponse
@@ -170,9 +171,9 @@ public class AccountsController : ControllerBase
         catch (Exception ex)
         {
             await transaction.RollbackAsync();
-            
+
             _logger.LogError(ex, "Failed to process deposit for account {AccountId}", id);
-            
+
             return StatusCode(500, new ProblemDetails
             {
                 Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",

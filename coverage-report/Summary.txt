@@ -1,0 +1,30 @@
+Summary
+  Generated on: 2026-10-02 - 4:40:44 PM
+  Coverage date: 2026-10-02 - 4:40:36 PM
+  Parser: Cobertura
+  Assemblies: 1
+  Classes: 8
+  Files: 6
+  Line coverage: 64.9%
+  Covered lines: 111
+  Uncovered lines: 60
+  Coverable lines: 171
+  Total lines: 488
+  Branch coverage: 46.6% (14 of 30)
+  Covered branches: 14
+  Total branches: 30
+  Method coverage: 64.2% (45 of 70)
+  Full method coverage: 57.1% (40 of 70)
+  Covered methods: 45
+  Fully covered methods: 40
+  Total methods: 70
+
+LedgerLite.Domain                                              64.9%
+  LedgerLite.Domain.Account                                    77.2%
+  LedgerLite.Domain.CurrencyExtensions                           50%
+  LedgerLite.Domain.Exceptions.DomainException                   50%
+  LedgerLite.Domain.Exceptions.InsufficientFundsException       100%
+  LedgerLite.Domain.Exceptions.LedgerEntryImmutableException      0%
+  LedgerLite.Domain.LedgerEntry                                75.8%
+  LedgerLite.Domain.Money                                      22.5%
+  LedgerLite.Domain.Transfer                                   75.4%

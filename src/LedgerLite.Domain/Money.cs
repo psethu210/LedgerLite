@@ -15,7 +15,7 @@ public readonly record struct Money(long MinorUnits, Currency Currency)
         var minorUnits = Math.Round(amount * currency.MinorUnitsPerMajor(), MidpointRounding.ToEven);
         return new Money((long)minorUnits, currency);
     }
-    
+
     /// <summary>
     /// Creates Money from major units (dollars, euros, etc.).
     /// Example: Money.FromMajor(12, Currency.USD) creates Money(1200, Currency.USD).
@@ -24,7 +24,7 @@ public readonly record struct Money(long MinorUnits, Currency Currency)
     {
         return new Money(majorUnits * currency.MinorUnitsPerMajor(), currency);
     }
-    
+
     /// <summary>
     /// Converts to decimal for display purposes.
     /// Example: Money(1234, Currency.USD).ToDecimal() returns 12.34m.
@@ -33,27 +33,27 @@ public readonly record struct Money(long MinorUnits, Currency Currency)
     {
         return (decimal)MinorUnits / Currency.MinorUnitsPerMajor();
     }
-    
+
     /// <summary>
     /// Zero amount in the specified currency.
     /// </summary>
     public static Money Zero(Currency currency) => new(0, currency);
-    
+
     /// <summary>
     /// Returns true if the amount is zero.
     /// </summary>
     public bool IsZero => MinorUnits == 0;
-    
+
     /// <summary>
     /// Returns true if the amount is positive.
     /// </summary>
     public bool IsPositive => MinorUnits > 0;
-    
+
     /// <summary>
     /// Returns true if the amount is negative.
     /// </summary>
     public bool IsNegative => MinorUnits < 0;
-    
+
     /// <summary>
     /// Adds two Money amounts. They must be in the same currency.
     /// </summary>
@@ -61,10 +61,10 @@ public readonly record struct Money(long MinorUnits, Currency Currency)
     {
         if (left.Currency != right.Currency)
             throw new InvalidOperationException($"Cannot add {left.Currency} and {right.Currency}");
-        
+
         return new Money(left.MinorUnits + right.MinorUnits, left.Currency);
     }
-    
+
     /// <summary>
     /// Subtracts two Money amounts. They must be in the same currency.
     /// </summary>
@@ -72,10 +72,10 @@ public readonly record struct Money(long MinorUnits, Currency Currency)
     {
         if (left.Currency != right.Currency)
             throw new InvalidOperationException($"Cannot subtract {right.Currency} from {left.Currency}");
-        
+
         return new Money(left.MinorUnits - right.MinorUnits, left.Currency);
     }
-    
+
     /// <summary>
     /// Negates a Money amount.
     /// </summary>
@@ -83,7 +83,7 @@ public readonly record struct Money(long MinorUnits, Currency Currency)
     {
         return new Money(-money.MinorUnits, money.Currency);
     }
-    
+
     public override string ToString()
     {
         return $"{ToDecimal():F2} {Currency}";
