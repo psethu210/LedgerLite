@@ -1,6 +1,6 @@
 # LedgerLite
 
-A demo ledger for learning production-style backend work in a payments setting. No real money and no real customer data.
+A demo ledger implementation in a payments setting. No real money and no real customer data.
 
 ## Prerequisites
 
